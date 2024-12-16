@@ -1,0 +1,8 @@
+{
+    "presets": ["@babel/preset-env", "@babel/preset-react"]
+}
+
+
+// @babel/preset-env: Transpiles modern JavaScript (ES6+) to be compatible with older browsers based on the target environment.
+
+// @babel/preset-react: Transpiles JSX syntax into regular JavaScript React.createElement calls.
