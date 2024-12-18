@@ -1,296 +1,188 @@
-// Difference Between Default Export and Named Export
-import React from "react";
+
+import React, { useCallback, useState } from "react";
 import Button from "./components/Button";
+// ### React Elements: What They Are and What They Do
+
+// - **React Element**: 
+//   A React element is a plain JavaScript object that represents a UI component. It contains information about the type of element (like `div`, `h1`, or a custom component), its properties (`props`), and its children.
+
+// - **Immutable Nature**:
+//   Yes, React elements are **immutable**. Once created, they cannot be changed. Instead of modifying the existing element, React creates a new element whenever there are changes.
+
+// ### Why Immutability?
+
+// 1. **Predictability**: Immutable objects ensure the state or props don't change directly, leading to fewer bugs.
+// 2. **Performance Optimization**: React uses **reconciliation** and **Virtual DOM** to efficiently update the UI. By comparing the previous and new element trees (via `diffing`), React minimizes DOM updates.
+// 3. **Debugging Ease**: Immutable structures make it easier to track and debug changes over time.
+
+// ### What Happens When Changes Occur?
+
+// 1. **Recreation of React Elements**:
+//    - React doesn't modify elements in place. For any update (e.g., state/prop change), it creates a new element tree.
+//    - Example: If `props` change for a component, React generates a new element representing the updated UI.
+
+// 2. **Reconciliation Process**:
+//    - React compares the new and previous Virtual DOM trees.
+//    - Only the changed parts are updated in the actual DOM, making updates efficient.
+
+// 3. **Component Lifecycle**:
+//    - When changes trigger a new element, React determines if it needs to **re-render** the component or just update parts of the DOM.
+//    - Functional components re-execute the function body. Class components may run lifecycle methods like `shouldComponentUpdate` to control rendering.
+
+// ### Why is This Approach Beneficial?
+
+// 1. **Efficiency**: The Virtual DOM and diffing algorithm ensure React minimizes expensive DOM manipulations.
+// 2. **Consistency**: Immutable updates ensure a clear, unidirectional data flow, avoiding unexpected side effects.
+// 3. **Scalability**: Makes large applications easier to manage by maintaining predictable behavior.
+
+// ### Key Takeaways:
+// - React elements are **immutable** and **lightweight objects** that describe the UI.
+// - React handles updates by **recreating elements**, **comparing them (diffing)**, and **efficiently updating the real DOM**.
+// - This immutability and reconciliation process ensures performance, scalability, and a predictable development experience.
 
 
 
-// a comprehensive list of conditional rendering approaches in React, including those commonly used in production-level applications:
-
-// 1. Using if-else Statements
-// A straightforward approach when rendering based on conditions.
-
-// function App({ isLoggedIn }) {
-//   if (isLoggedIn) {
-//     return <h1>Welcome Back!</h1>;
-//   } else {
-//     return <h1>Please Log In.</h1>;
-//   }
-// }
-
-// 2. Using Ternary Operator
-// A concise way for simple conditions.
-
-// function App({ isLoggedIn }) {
-//   return (
-//     <div>
-//       {isLoggedIn ? <h1>Welcome Back!</h1> : <h1>Please Log In.</h1>}
-//     </div>
-//   );
-// }
-// 3. Using Logical && Operator
-// For rendering elements only when a condition is true.
-
-// function App({ hasAccess }) {
-//   return (
-//     <div>
-//       <h1>Dashboard</h1>
-//       {hasAccess && <button>Access Admin Panel</button>}
-//     </div>
-//   );
-// }
-// 4. Using switch Statements
-// Useful for multiple conditions with distinct outcomes.
-
-// function App({ status }) {
-//   switch (status) {
-//     case "loading":
-//       return <p>Loading...</p>;
-//     case "success":
-//       return <h1>Welcome!</h1>;
-//     case "error":
-//       return <p>Error loading data.</p>;
-//     default:
-//       return <p>Unknown state</p>;
-//   }
-// }
-// 5. Inline Conditional Rendering
-// Embedding logic directly inside JSX for one-off conditions.
-
-// function App({ items }) {
-//   return (
-//     <div>
-//       {items.length > 0 ? (
-//         <ul>{items.map((item) => <li key={item}>{item}</li>)}</ul>
-//       ) : (
-//         <p>No items found.</p>
-//       )}
-//     </div>
-//   );
-// }
-
-// 6. Using IIFE (Immediately Invoked Function Expression)
-// Good for complex conditions that don’t fit inline logic.
-
-// function App({ user }) {
-//   return (
-//     <div>
-//       {(() => {
-//         if (user.isAdmin) return <h1>Admin Dashboard</h1>;
-//         if (user.isGuest) return <h1>Guest Dashboard</h1>;
-//         return <h1>General Dashboard</h1>;
-//       })()}
-//     </div>
-//   );
-// }
-
-// 7. Conditional Rendering via Higher-Order Components (HOCs)
-// Encapsulate conditions into reusable components.
-
-// function withAdminAccess(Component) {
-//   return function (props) {
-//     return props.isAdmin ? <Component {...props} /> : <p>Access Denied</p>;
-//   };
-// }
-
-// const AdminPanel = withAdminAccess(() => <h1>Admin Panel</h1>);
-
-// // Usage: <AdminPanel isAdmin={true} />
 
 
+// React Hooks: What They Are and How They Work
 
-// Rendering a List of Items
+// What Are Hooks? Hooks are special functions introduced in React 16.8 that let you use state and lifecycle features in functional components
+//  without needing class components. Examples include useState, useEffect, useMemo, and useReducer.
 
-// Rendering a list of items is common in React applications. Here are the primary ways to achieve it:
+// What Hooks Do: Hooks allow components to "hook into" React's internals:
 
-// 1. Using map()
-// The map() method is the most common way to iterate over an array and render a list.
-
-// const items = ["Apple", "Banana", "Cherry"];
-
-// function ItemList() {
-//   return (
-//     <ul>
-//       {items.map((item, index) => (
-//         <li key={index}>{item}</li>
-//       ))}
-//     </ul>
-//   );
-// }
+// State Management: useState gives functional components a way to manage local state.
+// Side Effects: useEffect allows you to run code in response to lifecycle events like mounting, updating, or unmounting.
+// Performance Optimization: useMemo and useCallback help memoize values and functions to avoid unnecessary recalculations or re-renders.
 
 
-// 2. Using forEach() (Not Recommended)
-// Although you can use forEach(), it does not return a new array and requires manual handling for rendering.
+// How React Hooks Work Under the Hood
 
-// const items = ["Apple", "Banana", "Cherry"];
+// Hooks and Immutable React Elements:
 
-// function ItemList() {
-//   const listItems = [];
-//   items.forEach((item, index) => {
-//     listItems.push(<li key={index}>{item}</li>);
-//   });
-//   return <ul>{listItems}</ul>;
-// }
+// React elements remain immutable, and hooks do not change this behavior.
+// When a component's state (via useState) or props update, React creates a new element for the component with the updated state or props.
+// This new element triggers the reconciliation process and updates the DOM efficiently.
+// Recreation and Persistence of State:
 
+// Hooks like useState persist values between renders by using an internal array within React's fiber tree.
+// Even though the component function re-runs on every render, the state values are preserved because React links the state to the component instance in the fiber.
+// Effect Execution:
 
-// 3. Using Conditional Rendering with Lists
-// You can render lists conditionally within JSX.
-
-// const items = ["Apple", "Banana", "Cherry"];
-
-// function ItemList({ showItems }) {
-//   return (
-//     <div>
-//       {showItems && (
-//         <ul>
-//           {items.map((item, index) => (
-//             <li key={index}>{item}</li>
-//           ))}
-//         </ul>
-//       )}
-//     </div>
-//   );
-// }
+// With useEffect, React schedules the effect to run after rendering, ensuring the DOM updates are already applied. 
+// Effects can depend on values (dependency array) and clean up old resources when dependencies change.
 
 
-// 4. Using reduce()
-// For more complex list structures, reduce() can be used.
+// Is it True That Hooks Cause Components to Re-render?
+// Not exactly:
 
-// const items = ["Apple", "Banana", "Cherry"];
+// State Changes Cause Re-renders: Hooks like useState cause the component to re-render when the state value changes.
+// Props Changes Trigger Re-renders: If the parent component passes new props, the child re-renders.
+// Avoiding Unnecessary Re-renders:
+// Use React.memo to skip rendering if props haven't changed.
+// Use useCallback or useMemo to memoize functions or computations.
 
-// function ItemList() {
-//   return (
-//     <ul>
-//       {items.reduce((acc, item, index) => {
-//         acc.push(<li key={index}>{item}</li>);
-//         return acc;
-//       }, [])}
-//     </ul>
-//   );
-// }
+//useState hook im here 
 
+// useState in React: Deep Dive
 
-// Importance of key Prop
-// The key prop is essential when rendering lists in React because it helps React identify which items in the list have changed, been added, or been removed. This optimization prevents unnecessary re-renders and improves performance.
+// What is useState?
 
-// Why key is Important?
-// Efficient DOM Updates: Keys allow React to keep track of elements, enabling efficient reordering, addition, or removal of list items.
-// Prevents Re-renders: Without keys, React re-renders all child components, leading to performance bottlenecks.
-// Error Prevention: Using key avoids warnings and errors in the console.
+// useState is a React Hook that allows functional components to have stateful logic. It enables components to remember values between renders
+//  and triggers re-renders when the state updates.
 
-// Best Practices for key Prop
-// Use unique IDs if available (e.g., database IDs).
-// Avoid using index as a key unless you are sure the list won’t change dynamically (e.g., no reordering or removal).
-// Example:
+// Syntax
 
-// const items = [
-//   { id: 1, name: "Apple" },
-//   { id: 2, name: "Banana" },
-//   { id: 3, name: "Cherry" },
-// ];
+// const [state, setState] = useState(initialValue); (always use state hooks at top level of your functional component ) (use this only for visual changes in screen or jsx)
 
-// function ItemList() {
-//   return (
-//     <ul>
-//       {items.map((item) => (
-//         <li key={item.id}>{item.name}</li>
-//       ))}
-//     </ul>
-//   );
-// }
+// state: The current value of the state.
+// setState: A function to update the state.
+// initialValue: The default state value (can be a primitive, object, or function).
+// Key Behaviors
+// Triggers Re-render:
+
+// Calling setState queues a re-render for the component.
+// React ensures the component's DOM is updated with the new state via the reconciliation process.
+// State Persistence:
+
+// State persists across re-renders but resets when the component unmounts.
+
+// Batching Updates:(very important)
+
+// React batches multiple setState calls in event handlers to optimize rendering.
 
 
-// Optimization Techniques for Rendering Lists
-// 1. Use Unique Keys
-// Ensure keys are unique and stable across renders. Avoid relying on indices for dynamic lists.
+// Common Mistakes
 
-// 2. Virtualization
-// For large lists, use libraries like React Virtualized or React Window to render only visible items.
+// Recreating State in Loops:
 
-// import { FixedSizeList as List } from "react-window";
+// Avoid calling useState conditionally or in loops; it must always execute in the same order.
 
-// const items = Array.from({ length: 1000 }, (_, index) => `Item ${index + 1}`);
+// Using Functions in setState:
 
-// function VirtualizedList() {
-//   return (
-//     <List height={200} itemCount={items.length} itemSize={35} width={300}>
-//       {({ index, style }) => (
-//         <div style={style} key={index}>
-//           {items[index]}
+// Use the functional form when the new state depends on the previous one:
+
+// setState((prevState) => prevState + 1);
+
+
+// Over-reliance on Derived State:
+
+// Don’t store derived state; compute it dynamically in JSX.
+
+//an example of how we would use it 
+//  const App = ()=>{
+//  const [jobstatus,setJobStatus] = useState("you have to get job or internship")
+//    const hanldechanges = ()=>{
+//     setJobStatus("you will get something eventually be patient");
+//    }
+//     return (
+//         <div>
+//             <p>{jobstatus}</p>
+//             <button onClick={hanldechanges}>updates?</button>
 //         </div>
-//       )}
-//     </List>
-//   );
+//     )
 // }
 
 
-// 3. Memoization
-// Use React.memo to prevent unnecessary re-renders of list items.
-
-// const ListItem = React.memo(({ item }) => {
-//   console.log("Rendering:", item);
-//   return <li>{item}</li>;
-// });
-
-// function ItemList({ items }) {
-//   return (
-//     <ul>
-//       {items.map((item) => (
-//         <ListItem key={item.id} item={item.name} />
-//       ))}
-//     </ul>
-//   );
-// }
+//dp this when you have new state variable depending on previous state
 
 
-// 4. Pagination or Infinite Scroll
-// Render lists in chunks to reduce DOM load.
+//important things to note :-
 
-// function PaginatedList({ items, pageSize }) {
-//   const [page, setPage] = React.useState(1);
-//   const paginatedItems = items.slice(0, page * pageSize);
-
-//   return (
-//     <div>
-//       <ul>
-//         {paginatedItems.map((item, index) => (
-//           <li key={index}>{item}</li>
-//         ))}
-//       </ul>
-//       <button onClick={() => setPage((prev) => prev + 1)}>Load More</button>
-//     </div>
-//   );
-// }
+//using callback function of set state can help us get the idea of what was the previous state of the compoenent
+//so this state updates are asynchronous ,set of updates are batched and react doesnt wait for any updation(this is applicable for all the states)
+//so this state updation re creates the whole component and from  this we learn that state updation is costlier method and is not supposed to be taken lightly off
 
 
-// 5. Avoid Inline Functions
-// Define functions outside the component to avoid recreating them on each render.
+//key insights from here
 
-// function ItemList({ items }) {
-//   const renderItem = (item) => <li key={item.id}>{item.name}</li>;
+//external component used in this component is also rendered ,because as previously we learned that props ,and state variable changes re redner the component 
+//that is the reason why Button.js is also re reendered and as well
 
-//   return <ul>{items.map(renderItem)}</ul>;
-// }
+//how to avoid this re render in Button.js
+// memo-> wont work as prop is changing each time ,//memo lets you skip the render whent is props are not changed(but props here did changed so didnt work out)
+//use callback ->useCallback will return a memoized version of the callback that only changes if one of the inputs has changed.
 
-
-// 6. Conditional Rendering with Skeleton Loaders
-
-// Use skeleton screens or placeholders to enhance user experience during data fetching.
-
-// function ItemList({ isLoading, items }) {
-//   return (
-//     <ul>
-//       {isLoading
-//         ? Array(5)
-//             .fill()
-//             .map((_, index) => <li key={index}>Loading...</li>)
-//         : items.map((item) => <li key={item.id}>{item.name}</li>)}
-//     </ul>
-//   );
-// }
-
- const App = ()=>{
+//im going to be learning about both of this hooks in coming days
+const App = ()=>{
+    const [jobOffer,setJobOffer] = useState(0)
+    //what use callback does here is it avoid the recreation of this function handle changes
+    //before this react was recreating this function to share update now recreation is stopped
+      const hanldechanges =useCallback( ()=>{
+        console.log("before state update value", jobOffer);
+       setJobOffer((prev)=>{
+        console.log("previous state of this component",prev);
+        return prev+1;
+       })
+       console.log("after state update value", jobOffer);
+      },[])
+       return (
+           <div>
+               <p>{jobOffer}</p>
+               <Button onClick={hanldechanges}>how many job offers?</Button>
+           </div>
+       )
+   }
    
-    return "my boii is out here learning some crazy stuff damn"
-}
 
 export default App;
