@@ -1,8 +1,8 @@
 import React from 'react'
 
-const Button = ({logClickAction,children}) => {
+const Button = () => {
   return (
-    <button onClick={logClickAction}>{children}</button>
+    <button>button</button>
   )
 }
 
