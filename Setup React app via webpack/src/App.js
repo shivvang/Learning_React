@@ -1,105 +1,91 @@
 
-import React, { useCallback, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "./components/Button";
+import Timer from "./components/Timer";
+//UseEffect
+
+// What is useEffect?
+
+//useEffect is a React Hook that lets you synchronize a component with an external system.
+
+// Syntax of useEffect
+// useEffect(effectFunction, dependencyArray);
+
+//What does it do?
+// It runs the effectFunction after the component renders or when specific values in the dependencyArray change.
+
+// Handles tasks outside the React rendering process (e.g., API calls).
+
+// Why does it do this?
+
+// React aims to keep the UI consistent with the state. useEffect ensures side effects don't disrupt this flow and are performed only at appropriate times.
 
 
-//key learning react fiber ,reconciliation ,virtual call stack
+// Parameters of useEffect
 
-// visit this for more info https://github.com/acdlite/react-fiber-architecture
+// effectFunction
 
+// The main logic to execute (e.g., API calls).
+// Can return a cleanup function to undo side effects.
 
-//whenever react renders  it creates a tree like structure
-
-//this tree like structure is compared to previously created tree and out of which minimal amount of changes are made(two tress new and previous tree,this tree are virtual doms)
-
-//so below is how it does what it does
-
-// React Reconciliation
-// What is it?
-// Reconciliation is React’s algorithm to update the DOM by efficiently determining the minimal set of changes required when state or props change.
-
-// What it does:
-
-// Diffing Algorithm: Compares the previous Virtual DOM tree with the current one to identify changes.
-// DOM Updates: Applies updates to the actual DOM only where differences exist.
-
-// Effects Produced:
-
-// Performance Optimization: Avoids unnecessary DOM updates, making React fast.
-// Consistency: Maintains a predictable rendering process by efficiently applying updates.
-// Component Keying: Optimized for lists by using unique key props to avoid mismatching elements during updates.
+// useEffect(() => {
+//   const interval = setInterval(() => console.log("Tick"), 1000);
+//   return () => clearInterval(interval); // Cleanup
+// }, []);
 
 
-// The key points are:
+// dependencyArray
 
-// In a UI, it's not necessary for every update to be applied immediately; in fact, doing so can be wasteful, causing frames to drop and degrading the user experience.
-// Different types of updates have different priorities — an animation update needs to complete more quickly than, say, an update from a data store.
-// A push-based approach requires the app (you, the programmer) to decide how to schedule work.
-//  A pull-based approach allows the framework (React) to be smart and make those decisions for you.
-// React doesn't currently take advantage of scheduling in a significant way;
-//  an update results in the entire subtree being re-rendered immediately. 
-// Overhauling React's core algorithm to take advantage of scheduling is the driving idea behind Fiber.
+// Controls when effectFunction runs.
+// Empty ([]): Run only once (on mount).
+// Values ([a, b]): Run whenever any value changes.
+// Omitted: Run after every render (not recommended).
 
 
-// primary goal of Fiber is to enable React to take advantage of scheduling. Specifically, we need to be able to
+// Real-Life Analogy
 
-// pause work and come back to it later.
-// assign priority to different types of work.
-// reuse previously completed work.
-// abort work if it's no longer needed.
+// Think of useEffect as a task scheduler in your house:
 
+// Effect function: You water plants in the garden.
 
-// The way computers typically track a program's execution is using the call stack.
-//  When a function is executed, a new stack frame is added to the stack. 
-// That stack frame represents the work that is performed by that function.
+// Dependency array: It only happens when the soil gets dry (dependency).
 
-// When dealing with UIs, the problem is that if too much work is executed all at once,
-//  it can cause animations to drop frames and look choppy. What's more, some of that work may be unnecessary
+// Cleanup: After watering, you turn off the hose (cleanup).
 
-//important note
-// That's the purpose of React Fiber. Fiber is reimplementation of the stack, specialized for React components.
-//  You can think of a single fiber as a virtual stack frame.
+// This ensures you don’t waste water or overdo it.
 
 
 
-// React Fiber(virtual stack frame)
-// What is it?
-// React Fiber is the reimplementation of React's core algorithm introduced in (React 16). It uses a fiber architecture to efficiently manage rendering and updates.
+//useffect in action
+//with no dependency it re runs 
+//when a dependency passed it runs each time the depency value changes thats for sure this values can be any variable ,state variable,functions ,we can pas props etc
+//when simply depency array is passed it runs only when the componenet mounts
+//writing a clean up function has to be most cruical part for  use effect other wise it will keep on running ,(memory leak scenario)
 
-// What it does:
-
-// Prioritizes Rendering: Breaks rendering into units of work that React can pause, resume, or abort.
-// Concurrent Mode: Enables smooth animations, responsiveness, and multitasking by scheduling high-priority tasks first.
-// Reusability: Uses a tree of "fiber nodes" to track the state and work required for each component.
-// Effects Produced:
-
-// Incremental Rendering: Divides large tasks into smaller chunks to avoid blocking the main thread, improving performance.
-// Better User Experience: Guarantees interactive UI updates by ensuring urgent tasks (e.g., animations) run before less critical ones.
-// Error Recovery: React Fiber handles errors gracefully with improved recovery mechanisms.
+//clean up funciton wil run for evry type of useffect whether it has depency elements in the dependcy array ,or it is only running during mount etc
+//so the clean up function run only once  ohk 
+//for the example of it go to Timer.js
 
 
-// Key Relationship Between Fiber and Reconciliation
-// Fiber handles the scheduling, 
-// while reconciliation determines the updates. Together, 
-// they ensure smooth and efficient UI updates even under heavy workloads.
-
-const App = ()=>{
-    const [jobOffer,setJobOffer] = useState(0)
-    //what use callback does here is it avoid the recreation of this function handle changes
-    //before this react was recreating this function to share update now recreation is stopped
-      const hanldechanges =useCallback( ()=>{
-        console.log("before state update value", jobOffer);
-       setJobOffer((prev)=>{
-        console.log("previous state of this component",prev);
-        return prev+1;
-       })
-       console.log("after state update value", jobOffer);
-      },[])
+//very important
+//important thing to note here is if we have like hundered of useffect in the component and if  component is unmounted ,then each and every other useeffect function clean up fucntion will be triggered
+ const App = ()=>{
+    const[counter,setCounter] = useState(0);
+    const[show,setShow] = useState(true);
+    useEffect(() => {
+        console.log(`im running ${counter} time only`)
+    },[counter])
        return (
-           <div>
-               <p>{jobOffer}</p>
-               <Button onClick={hanldechanges}>how many job offers?</Button>
-           </div>
+        
+        <div>
+          <h1>some things just dont workout sometimes bro </h1>
+          <Button setCounter={setCounter}>click for {counter} year's of succes in life </Button>
+          <br/>
+          {show &&<Timer sometext="idk what to write here bro"/>}
+          <br/>
+          <button onClick={()=>setShow(()=>!show)}>do not dispaly timer</button>
+          </div>
+        
        )
    }
    
