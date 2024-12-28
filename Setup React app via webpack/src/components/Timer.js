@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 
 const Timer =({sometext})=>{
     const [counter,setCounter] = useState(0);
@@ -22,6 +22,9 @@ const Timer =({sometext})=>{
         }
     },[sometext])
 
+    useLayoutEffect(()=>{
+        console.log("im the one who runs first and blocks stuff until im finsihed");
+    },[])
     return(
         <>
         <span>{counter} seconds passed till the page refereshes </span>
