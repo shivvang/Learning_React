@@ -1,34 +1,42 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
-
+import React, { useEffect,useRef,useState } from "react";
 const Timer =({sometext})=>{
+
+    //reason why we use ref here instead of let variable beacuse after every render the let variable would be undefined causing it to mess thing up so bad
+    const interval = useRef(null);
+
     const [counter,setCounter] = useState(0);
     //writing a clean up function has to be most cruical part for this use effect other wise it will keep on running ,(memory leak scenario)
     useEffect(()=>{
-        console.log("i am running still")
-        const interval = setInterval(()=>{setCounter((prev)=>prev+1)},1000)
-        console.log("interaval id ",interval);
+      
+         interval.current = setInterval(()=>{setCounter((prev)=>prev+1)},1000)
+        
         return ()=>{
-            console.log("ohk i have stopped running bro chill component unmounted");
-            clearInterval(interval);
-            console.log("interaval id after being removed ",interval);
+           
+            clearInterval(interval.current);
+    
         }
     },[])
 
-    useEffect(()=>{
-        console.log("yo im running to")
+    // useEffect(()=>{
+    //     console.log("yo im running to")
 
-        return ()=>{
-            console.log("i stopped running got cleaned up beacause the component unmounted")
-        }
-    },[sometext])
+    //     return ()=>{
+    //         console.log("i stopped running got cleaned up beacause the component unmounted")
+    //     }
+    // },[sometext])
 
-    useLayoutEffect(()=>{
-        console.log("im the one who runs first and blocks stuff until im finsihed");
-    },[])
+    // useLayoutEffect(()=>{
+    //     console.log("im the one who runs first and blocks stuff until im finsihed");
+    // },[])
+
+    const stoptime = ()=>{
+        clearInterval(interval.current);
+    }
     return(
         <>
         <span>{counter} seconds passed till the page refereshes </span>
-        <p>{sometext}</p>
+        <br/>
+        <button onClick={stoptime}>{sometext}</button>
         </>
     );
 }

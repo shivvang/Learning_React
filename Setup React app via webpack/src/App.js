@@ -1,91 +1,116 @@
 
-import React, { useEffect, useState } from "react";
-import Button from "./components/Button";
+import React, { useRef, useState } from "react";
 import Timer from "./components/Timer";
-import BtnToolTIp from "./components/BtnToolTIp";
-
-//useLayoutEffect
-
-// useLayoutEffect is a React Hook that allows you to perform side effects synchronously after the DOM mutations but before the browser has a chance to paint. 
-// This means the updates made inside this hook will block the browser's rendering, ensuring that the user sees a consistent state.
-
-// Key Points
-
-// What it does:
-
-// Similar to useEffect, it lets you perform side effects (e.g., DOM manipulation, subscription setup).
-// It fires after the DOM updates but before the browser paints.
-
-// Parameters:
-
-// useLayoutEffect(callback, dependencies)
-// callback: A function containing the effect logic.
-// dependencies: An array of variables that the effect depends on. If any of these variables change, the effect re-runs.
-
-
-// Why it does what it does:
-
-// React batches DOM updates to improve performance. Sometimes, you need to adjust the DOM synchronously after React updates it to ensure the layout is correct 
-// before the user sees the UI. This is why useLayoutEffect runs before the browser paints, ensuring there’s no visual flicker.
-
-// Comparison with useEffect
-// Feature	                useEffect	                                             useLayoutEffect
-// Execution Timing	    After browser paint (asynchronous)	            Before browser paint (synchronous)
-// Impact on Rendering	Non-blocking; doesn't affect UI rendering.	Blocking; prevents UI rendering until done.
-// Primary Use Case	   API calls, logging, subscriptions, etc.	   DOM measurement, synchronizing layouts.
+import Input from "./components/Input";
 
 
 
-// Advantages of useLayoutEffect
-
-// Accurate Layout Adjustments: Ensures DOM measurements are taken after updates but before paint.
-// Prevents Flickering: Changes made in this hook are visible immediately during the first paint.
-// Useful for Animations: When precise timing between DOM changes and animations is required.
-
-// Disadvantages of useLayoutEffect
-
-// Blocks Rendering: Since it runs synchronously, it can delay rendering and degrade performance.
-// Complexity: Misusing it can lead to subtle bugs, especially when overused or unnecessary.
-// Not Always Needed: For many use cases, useEffect suffices and is more performant.
+//local variable doesnt change at all because it is not persistent ,and is initialize to zero after every re render
+//ref  variable has a  property of persisting value accross all the  render cycle  and this does not causes re render
+//state variable has a property to perist value in render cycles and also cause state change as well which causes re render
 
 
-//When to Use useLayoutEffect
-// When you need to synchronize DOM changes with React updates.
-// When you need to measure the DOM (e.g., get dimensions or position of elements).
-// When the UI needs to appear consistent without flickers during the initial render.
+// 📌 ref Attribute in HTML
+// Used to directly reference a DOM element.
+// Commonly applied in frameworks like React for manipulating DOM nodes or getting their values.
+// Example: <input ref="myInputRef" /> (React-specific syntax).
 
 
-// Real-Life Analogy
-// Imagine you're decorating a room before a surprise party:
+// 📌 useRef in React
 
-// useEffect: You let the guests enter the room and then adjust the decorations. Some might notice the adjustments being made.
+// What: A React hook (useRef) that creates a mutable reference object ({ current: ... }) that persists across renders.
+// Syntax:
 
-// useLayoutEffect: You finish decorating the room entirely before the guests enter, ensuring they only see the final look.
+// const myRef = useRef(initialValue);
+// Why Use: Access DOM elements directly or store values without triggering re-renders.
+// Real-Life Analogy: A bookmark in a book — quickly lets you access a specific page without flipping through every page.
+
+// Example:
 
 
-//example of this in BtnToolTIp.js
+// import { useRef } from 'react';
+
+// function FocusInput() {
+//   const inputRef = useRef(null);
+//   const focusInput = () => inputRef.current.focus();
+
+//   return <input ref={inputRef} />;
+// }
+
+
+// 📌 forwardRef in React
+
+//forwardRef lets your component expose a DOM node to parent component with a ref.
+
+// What: A function to pass ref from a parent to a child component.
+
+// Syntax:
+
+// const Child = React.forwardRef((props, ref) => (
+//   <input ref={ref} {...props} />
+// ));
+
+// Why Use: Enables parent components to directly access child DOM nodes or React components.
+// Real-Life Analogy: A middleman delivering a package to the intended recipient.
+
+// Example:
+
+// const InputField = React.forwardRef((props, ref) => (
+//   <input ref={ref} {...props} />
+// ));
+
+// function Parent() {
+//   const inputRef = useRef(null);
+//   return <InputField ref={inputRef} />;
+// }
+
+// 📌 useRef vs State Variables
+
+// useRef	State Variable
+// Doesn't cause re-renders.	Triggers re-renders on update.
+// Used for direct DOM manipulation.	Used for UI state management.
+// Mutable (ref.current).	Immutable; updates require setter function.
+
+// 📌 Key Properties of useRef:
+// current: Stores the reference value.
+// Mutable: Can update .current without re-rendering.
+// Persistent: Value persists across renders.
+
+// When to Use:
+
+// Accessing DOM nodes directly.
+// Storing mutable values without causing re-renders.
+
+
 
  const App = ()=>{
-    const[counter,setCounter] = useState(0);
-    const[show,setShow] = useState(true);
-    useEffect(() => {
-        console.log(`im running ${counter} time only`)
-    },[counter])
+   let mylocal=0;
+   const ref =  useRef(0);
+   const [mycount,setMyCount] = useState(0);
+   const inputref = useRef(null);
        return (
         
-        <div>
-          <h1>some things just dont workout sometimes bro </h1>
-          <Button setCounter={setCounter}>click for {counter} year's of succes in life </Button>
-          <br/>
-          {show &&<Timer sometext="idk what to write here bro"/>}
-          <br/>
-          <button onClick={()=>setShow(()=>!show)}>do not dispaly timer</button>
+       <>
+         <button onClick={()=>{
+            mylocal+=1;
+         }}>Change local variable</button>
+         <button onClick={()=>{ref.current+=1}}>Change ref</button>
+         <button onClick={()=>setMyCount((prev)=>prev+1)}>Change state variable</button>
 
-          <br/>
-          <BtnToolTIp ttcontent={<div>this doesnt fit above the button <br/> This is why it is displayed  below instead</div>}>
-          Hover Over Me Bro
-          </BtnToolTIp>
-          </div>
+         <div>
+            <span>Local var:{mylocal}</span><br/>
+            <span>ref var:{ref.current}</span><br/>
+            <span>state var:{mycount}</span>
+         </div>
+         <h4>one more crazy example of use ref</h4>
+         <Timer sometext="Click Me To Stop Timer"/>
+
+         <h3>dom manipulation using ref</h3>
+         <Input ref = {inputref}/> <br/>
+         <button onClick={()=>[
+            inputref.current.focus()
+         ]}>click me to foucs on input</button>
+       </>
         
        )
    }
