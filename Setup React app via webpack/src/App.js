@@ -1,115 +1,83 @@
 
-import React, { useRef, useState } from "react";
-import Timer from "./components/Timer";
-import Input from "./components/Input";
+import React, { useState } from "react";
+import SecondComp from "./components/SecondComp";
+
+
+//problem statement:-
+
+//The problem arises because whenever the count state is updated, 
+// it causes this component to re-render, which in turn re-renders the second component, 
+// eventually leading to the recreation of the third component — a very slow component.
+
+
+//To prevent this, we need to stop the recreation of the third component, as it’s the reason why state updates have become slower.
+//Looking at the code structure, we notice that the second component is passing props. From previous concepts, we know that memo can help here because the props aren’t changing, 
+// and therefore, they won’t trigger a re-render.
+
+//However, the problem persists because the handleClick function is recreated every time the state updates.
+//By using useCallback on handleClick, we can prevent it from being recreated on every render, essentially caching it to avoid unnecessary rendering of the third component.
+
+//Now, the first counter works faster because, although the state in the App component changes and causes a re-render,
+//the handleClick function in the SecondComp remains unchanged. This prevents the recreation of the third component.
 
 
 
-//local variable doesnt change at all because it is not persistent ,and is initialize to zero after every re render
-//ref  variable has a  property of persisting value accross all the  render cycle  and this does not causes re render
-//state variable has a property to perist value in render cycles and also cause state change as well which causes re render
-
-
-// 📌 ref Attribute in HTML
-// Used to directly reference a DOM element.
-// Commonly applied in frameworks like React for manipulating DOM nodes or getting their values.
-// Example: <input ref="myInputRef" /> (React-specific syntax).
-
-
-// 📌 useRef in React
-
-// What: A React hook (useRef) that creates a mutable reference object ({ current: ... }) that persists across renders.
-// Syntax:
-
-// const myRef = useRef(initialValue);
-// Why Use: Access DOM elements directly or store values without triggering re-renders.
-// Real-Life Analogy: A bookmark in a book — quickly lets you access a specific page without flipping through every page.
-
-// Example:
-
-
-// import { useRef } from 'react';
-
-// function FocusInput() {
-//   const inputRef = useRef(null);
-//   const focusInput = () => inputRef.current.focus();
-
-//   return <input ref={inputRef} />;
-// }
-
-
-// 📌 forwardRef in React
-
-//forwardRef lets your component expose a DOM node to parent component with a ref.
-
-// What: A function to pass ref from a parent to a child component.
+// useCallback in React
+// What: A React hook that memoizes a function to prevent unnecessary re-creations on every render.
 
 // Syntax:
 
-// const Child = React.forwardRef((props, ref) => (
-//   <input ref={ref} {...props} />
-// ));
+// const memoizedCallback = useCallback(() => {
+//   // Your logic here
+// }, [dependencies]);
 
-// Why Use: Enables parent components to directly access child DOM nodes or React components.
-// Real-Life Analogy: A middleman delivering a package to the intended recipient.
+// Why Use: To optimize performance by avoiding re-creation of functions unless dependencies change.
+
+// Real-Life Analogy: A pre-saved shortcut on your desktop — it only updates when the path (dependencies) changes.
 
 // Example:
 
-// const InputField = React.forwardRef((props, ref) => (
-//   <input ref={ref} {...props} />
-// ));
+// import React, { useState, useCallback } from 'react';
 
-// function Parent() {
-//   const inputRef = useRef(null);
-//   return <InputField ref={inputRef} />;
+// function Counter() {
+//   const [count, setCount] = useState(0);
+
+//   const increment = useCallback(() => {
+//     setCount(count + 1);
+//   }, [count]);
+
+//   return <button onClick={increment}>Increment</button>;
 // }
 
-// 📌 useRef vs State Variables
 
-// useRef	State Variable
-// Doesn't cause re-renders.	Triggers re-renders on update.
-// Used for direct DOM manipulation.	Used for UI state management.
-// Mutable (ref.current).	Immutable; updates require setter function.
+// 📌 When to Use useCallback:
+// Passing functions as props to child components (to prevent unnecessary re-renders).
+// Avoiding function re-creation on every render.
 
-// 📌 Key Properties of useRef:
-// current: Stores the reference value.
-// Mutable: Can update .current without re-rendering.
-// Persistent: Value persists across renders.
+// 📌 useCallback vs useMemo:
+// useCallback	                  useMemo
+// Returns a memoized function.	Returns a memoized value.
+// Used for functions.	         Used for expensive calculations.
 
-// When to Use:
-
-// Accessing DOM nodes directly.
-// Storing mutable values without causing re-renders.
-
-
+// 📌 Key Properties of useCallback:
+// Memoization: Stores the function reference.
+// Dependencies Array: Only updates if dependencies change.
+// Performance Optimization: Reduces unnecessary renders of child components.
 
  const App = ()=>{
-   let mylocal=0;
-   const ref =  useRef(0);
-   const [mycount,setMyCount] = useState(0);
-   const inputref = useRef(null);
+   const [count1 ,setCount1] = useState(0);
+   const [count2 ,setCount2] = useState(0);
        return (
         
        <>
-         <button onClick={()=>{
-            mylocal+=1;
-         }}>Change local variable</button>
-         <button onClick={()=>{ref.current+=1}}>Change ref</button>
-         <button onClick={()=>setMyCount((prev)=>prev+1)}>Change state variable</button>
+       {count1} times is how many times im gonna fail and get back up
+       <br/>
+       <button onClick={()=>setCount1((prev)=>prev+1)}>click me to add more challanges to your life</button><br/>
 
-         <div>
-            <span>Local var:{mylocal}</span><br/>
-            <span>ref var:{ref.current}</span><br/>
-            <span>state var:{mycount}</span>
-         </div>
-         <h4>one more crazy example of use ref</h4>
-         <Timer sometext="Click Me To Stop Timer"/>
-
-         <h3>dom manipulation using ref</h3>
-         <Input ref = {inputref}/> <br/>
-         <button onClick={()=>[
-            inputref.current.focus()
-         ]}>click me to foucs on input</button>
+       {count2} times is how many times im gonna fail and get back up
+       <br/>
+       <button onClick={()=>setCount2((prev)=>prev+1)}>click me to add more challanges to your life</button><br/>
+       <SecondComp count1 = {count1}/>
        </>
         
        )
