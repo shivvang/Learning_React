@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { memo } from 'react'
 
 const generateNum =(num)=>{
     const arr = []
@@ -15,11 +15,16 @@ const generateNum =(num)=>{
 }
 
 
-const PrintTable = ({num}) => {
-    const arr =useMemo(()=>generateNum(num),[num]);
+const PrintTable = memo(({num,obj,val,arrrr}) => {
+    const arr = generateNum(num);
   return (
+    <>
     <div>{arr}</div>
+    {obj?.drugs}
+    {val}
+    {arrrr?.map((item)=><span>{item}</span>)}
+    </>
   )
-}
+})
 
 export default PrintTable

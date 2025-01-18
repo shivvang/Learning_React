@@ -1,44 +1,61 @@
 
-import React, { useState } from "react";
+import React, { useState,useMemo } from "react";
 import PrintTable from "./components/PrintTable";
 
-// React useMemo Hook
+// What is memo?
 
-// What is useMemo?
-
-// useMemo is a React Hook that caches the result of a function to optimize performance. It recomputes only when dependencies change, preventing unnecessary recalculations.
+// memo is a React Higher-Order Component (HOC) that prevents unnecessary re-renders by memoizing a component.
 
 // What does it do?
 
-// Speeds up performance by avoiding expensive calculations on every render.
-// Caches the computed value until dependencies change.
+// Skips re-rendering if the component’s props haven’t changed.
+// Works only for functional components.
 
-// What is a Pure Function?
-// A function that always returns the same output for the same input.
-// Has no side effects (doesn’t modify variables outside its scope).
+// How is it different from useMemo?
 
-// What is Caching in useMemo?
-// Stores computed values instead of recalculating them on every render.
-// Uses memoization to return the previous result if inputs are unchanged.
+// memo caches the entire component to prevent unnecessary re-renders.
+
+// useMemo caches values inside a component to avoid recomputation.
+
+
+// What is Caching in memo?
+
+// Stores the last rendered output of a component.
+
+// If props haven’t changed, React reuses the cached version instead of re-rendering.
 
 // Syntax
 
-// const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
-// Runs computeExpensiveValue(a, b) only if a or b changes.
-// If dependencies don’t change, React reuses the previous result.
+// import React, { memo } from 'react';
+
+// const MyComponent = memo(({ value }) => {
+//   console.log("Rendered");
+//   return <div>{value}</div>;
+// });
+
+
+// MyComponent only re-renders when value changes.
 
 // Analogy
+// Without memo: Like redrawing the same painting every time you see it.
+// With memo: You save a copy and just look at it when needed, avoiding extra work.
 
-// Without useMemo: Like reordering your entire bookshelf every time you search for a book.
-// With useMemo: You remember the book’s location and directly grab it, saving time.
 
 // Concise Summary
 
-// useMemo caches expensive calculations and recomputes only when dependencies change.
-// Improves performance by avoiding unnecessary recalculations.
-// Works on pure functions that return the same output for the same input.
+// memo prevents re-renders if props haven't changed.
+// Optimizes performance by avoiding unnecessary updates.
+// Works for functional components and is useful when a parent re-renders frequently.
 
 
+// Minimizing props changes (important pls note this) 
+
+// When you use memo, your component re-renders whenever any prop is not shallowly equal to what it was previously. 
+// This means that React compares every prop in your component with its previous value using the Object.is comparison. 
+// Note that Object.is(3, 3) is true, but Object.is({}, {}) is false.
+
+// To get the most out of memo, minimize the times that the props change. 
+// For example, if the prop is an object, prevent the parent component from re-creating that object every time by using useMemo:
 
 
 
@@ -46,12 +63,16 @@ import PrintTable from "./components/PrintTable";
 
 // Why? By default, when a component re-renders, all its child components also re-render unless optimized.
 
-// Using React.memo: Reduces unnecessary re-renders but doesn’t prevent expensive function execution.
-
-// Using useMemo: Caches the computed table, so it doesn’t recompute when counter2 updates, significantly improving performance.
  const App = ()=>{
    const [counter1, setCounter1] = useState(0)
    const [counter2, setCounter2] = useState(0)
+
+   const obj={drugs:"yeswhynot"};
+   const arr = useMemo(()=>[1,2,3,4,5,6],[]);
+   //after memoizing this arr this problem object is solved as this ,component when mounts it makes the array once ,and then if re renders are caused
+   //then it see no value change so it reamins same as it was 
+   
+   const val =1;
        return (
         
        <>
@@ -59,7 +80,7 @@ import PrintTable from "./components/PrintTable";
       <button onClick={()=>setCounter1((prev)=>prev+1)}>incrment counter1</button><br/>
       {counter2} counter2 <br/>
       <button onClick={()=>setCounter2((prev)=>prev+1)}>incrment counter2</button><br/>
-      <PrintTable num={counter1}/>
+      <PrintTable num={counter1} arrrr={arr}/>
        </>
         
        )
