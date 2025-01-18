@@ -1,83 +1,65 @@
 
 import React, { useState } from "react";
-import SecondComp from "./components/SecondComp";
+import PrintTable from "./components/PrintTable";
+
+// React useMemo Hook
+
+// What is useMemo?
+
+// useMemo is a React Hook that caches the result of a function to optimize performance. It recomputes only when dependencies change, preventing unnecessary recalculations.
+
+// What does it do?
+
+// Speeds up performance by avoiding expensive calculations on every render.
+// Caches the computed value until dependencies change.
+
+// What is a Pure Function?
+// A function that always returns the same output for the same input.
+// Has no side effects (doesn’t modify variables outside its scope).
+
+// What is Caching in useMemo?
+// Stores computed values instead of recalculating them on every render.
+// Uses memoization to return the previous result if inputs are unchanged.
+
+// Syntax
+
+// const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
+// Runs computeExpensiveValue(a, b) only if a or b changes.
+// If dependencies don’t change, React reuses the previous result.
+
+// Analogy
+
+// Without useMemo: Like reordering your entire bookshelf every time you search for a book.
+// With useMemo: You remember the book’s location and directly grab it, saving time.
+
+// Concise Summary
+
+// useMemo caches expensive calculations and recomputes only when dependencies change.
+// Improves performance by avoiding unnecessary recalculations.
+// Works on pure functions that return the same output for the same input.
 
 
-//problem statement:-
-
-//The problem arises because whenever the count state is updated, 
-// it causes this component to re-render, which in turn re-renders the second component, 
-// eventually leading to the recreation of the third component — a very slow component.
-
-
-//To prevent this, we need to stop the recreation of the third component, as it’s the reason why state updates have become slower.
-//Looking at the code structure, we notice that the second component is passing props. From previous concepts, we know that memo can help here because the props aren’t changing, 
-// and therefore, they won’t trigger a re-render.
-
-//However, the problem persists because the handleClick function is recreated every time the state updates.
-//By using useCallback on handleClick, we can prevent it from being recreated on every render, essentially caching it to avoid unnecessary rendering of the third component.
-
-//Now, the first counter works faster because, although the state in the App component changes and causes a re-render,
-//the handleClick function in the SecondComp remains unchanged. This prevents the recreation of the third component.
 
 
 
-// useCallback in React
-// What: A React hook that memoizes a function to prevent unnecessary re-creations on every render.
+// Problem: When counter1 updates, PrintTable takes time to re-render. However, when counter2 updates, React still re-renders PrintTable unnecessarily, even though num hasn't changed.
 
-// Syntax:
+// Why? By default, when a component re-renders, all its child components also re-render unless optimized.
 
-// const memoizedCallback = useCallback(() => {
-//   // Your logic here
-// }, [dependencies]);
+// Using React.memo: Reduces unnecessary re-renders but doesn’t prevent expensive function execution.
 
-// Why Use: To optimize performance by avoiding re-creation of functions unless dependencies change.
-
-// Real-Life Analogy: A pre-saved shortcut on your desktop — it only updates when the path (dependencies) changes.
-
-// Example:
-
-// import React, { useState, useCallback } from 'react';
-
-// function Counter() {
-//   const [count, setCount] = useState(0);
-
-//   const increment = useCallback(() => {
-//     setCount(count + 1);
-//   }, [count]);
-
-//   return <button onClick={increment}>Increment</button>;
-// }
-
-
-// 📌 When to Use useCallback:
-// Passing functions as props to child components (to prevent unnecessary re-renders).
-// Avoiding function re-creation on every render.
-
-// 📌 useCallback vs useMemo:
-// useCallback	                  useMemo
-// Returns a memoized function.	Returns a memoized value.
-// Used for functions.	         Used for expensive calculations.
-
-// 📌 Key Properties of useCallback:
-// Memoization: Stores the function reference.
-// Dependencies Array: Only updates if dependencies change.
-// Performance Optimization: Reduces unnecessary renders of child components.
-
+// Using useMemo: Caches the computed table, so it doesn’t recompute when counter2 updates, significantly improving performance.
  const App = ()=>{
-   const [count1 ,setCount1] = useState(0);
-   const [count2 ,setCount2] = useState(0);
+   const [counter1, setCounter1] = useState(0)
+   const [counter2, setCounter2] = useState(0)
        return (
         
        <>
-       {count1} times is how many times im gonna fail and get back up
-       <br/>
-       <button onClick={()=>setCount1((prev)=>prev+1)}>click me to add more challanges to your life</button><br/>
-
-       {count2} times is how many times im gonna fail and get back up
-       <br/>
-       <button onClick={()=>setCount2((prev)=>prev+1)}>click me to add more challanges to your life</button><br/>
-       <SecondComp count1 = {count1}/>
+      {counter1} counter1 <br/>
+      <button onClick={()=>setCounter1((prev)=>prev+1)}>incrment counter1</button><br/>
+      {counter2} counter2 <br/>
+      <button onClick={()=>setCounter2((prev)=>prev+1)}>incrment counter2</button><br/>
+      <PrintTable num={counter1}/>
        </>
         
        )
