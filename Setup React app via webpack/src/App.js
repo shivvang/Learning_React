@@ -1,34 +1,158 @@
 
-import React, {useState } from "react";
-import {createPortal} from "react-dom"
+import React from "react";
+import {useSelector,useDispatch} from "react-redux"
+import { increment ,decrement, incrementByAmount} from "./slice/counterSlice";
 
 
-// 📌 What is createPortal?
-// createPortal is a React feature that renders a component outside its parent DOM hierarchy while still keeping React’s state and event handling.
+// Redux Toolkit Notes
 
-// 📌 Why Use React Portals?
-// 🔹 Avoid CSS issues – Some components (e.g., modals, tooltips) might get hidden due to overflow: hidden in a parent container. Portals help bypass this restriction.
-// 🔹 Prevent z-index conflicts – Modals or popups inside deeply nested elements might have CSS issues due to stacking contexts.
-// 🔹 Maintain accessibility – Portals let you place elements where they logically belong in the DOM (e.g., a modal inside <body>, not inside a deeply nested component).
-// 🔹 Improve performance – Moving elements outside a complex DOM tree avoids unnecessary re-renders of parent components.
+// 1️⃣ Configure the Redux Store with configureStore
 
-// 📌 Syntax of createPortal
+// configureStore simplifies store setup with good defaults.
 
-// createPortal(child, container);
+// Accepts a reducer function as a named argument.
 
-// child – The React component or element to render.
+// Automatically sets up Redux DevTools and middleware like thunk.
 
-// container – The DOM node where it should be rendered.
+// Example:
 
+// import { configureStore } from '@reduxjs/toolkit';
+// import counterReducer from './counterSlice';
+
+// const store = configureStore({
+//   reducer: {
+//     counter: counterReducer,
+//   },
+// });
+
+// export default store;
+
+// 2️⃣ Provide the Redux Store to React Components
+
+// Use <Provider> from react-redux to wrap the app.
+
+// Pass the store as a prop to <Provider>.
+
+// Example:
+
+// import React from 'react';
+// import ReactDOM from 'react-dom';
+// import { Provider } from 'react-redux';
+// import store from './store';
+// import App from './App';
+
+// ReactDOM.render(
+//   <Provider store={store}>
+//     <App />
+//   </Provider>,
+//   document.getElementById('root')
+// );
+
+// 3️⃣ Create a Redux "Slice" Reducer with createSlice
+
+// createSlice generates action creators and reducers in one step.
+
+// Accepts:
+
+// A name (used in action types).
+
+// An initial state.
+
+// Reducers that update state (can use mutation syntax via Immer).
+
+// Example:
+
+// import { createSlice } from '@reduxjs/toolkit';
+
+// const counterSlice = createSlice({
+//   name: 'counter',
+//   initialState: { value: 0 },
+//   reducers: {
+//     increment: (state) => {
+//       state.value += 1; // Uses Immer, so mutation is fine
+//     },
+//     decrement: (state) => {
+//       state.value -= 1;
+//     },
+//     incrementByAmount: (state, action) => {
+//       state.value += action.payload;
+//     },
+//   },
+// });
+
+// export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+// export default counterSlice.reducer;
+
+// 4️⃣ Read Data from Store with useSelector
+
+// useSelector allows components to access Redux store state.
+
+// Example:
+
+// import { useSelector } from 'react-redux';
+
+// const CounterValue = () => {
+//   const count = useSelector((state) => state.counter.value);
+//   return <div>Count: {count}</div>;
+// };
+
+// 5️⃣ Dispatch Actions with useDispatch
+
+// useDispatch returns the store's dispatch function.
+
+// Used to send actions to the Redux store.
+
+// Example:
+
+// import { useDispatch } from 'react-redux';
+// import { increment, decrement } from './counterSlice';
+
+// const CounterButtons = () => {
+//   const dispatch = useDispatch();
+
+//   return (
+//     <div>
+//       <button onClick={() => dispatch(increment())}>+</button>
+//       <button onClick={() => dispatch(decrement())}>-</button>
+//     </div>
+//   );
+// };
+
+// 6️⃣ How createSlice and createReducer Use Immer
+
+// Immer allows writing "mutating" logic that is converted into immutable updates.
+
+// Redux Toolkit handles state immutability automatically.
+
+// Example:
+
+// import { createReducer } from '@reduxjs/toolkit';
+// import { increment, decrement } from './counterSlice';
+
+// const counterReducer = createReducer({ value: 0 }, {
+//   [increment]: (state) => { state.value += 1; },
+//   [decrement]: (state) => { state.value -= 1; },
+// });
+
+// 7️⃣ Summary
+
+// ✅ configureStore sets up the Redux store with sensible defaults.
+// ✅ <Provider> makes the Redux store available to components.
+// ✅ createSlice simplifies creating reducers and actions.
+// ✅ useSelector reads values from the Redux store.
+// ✅ useDispatch sends actions to update the store.
+// ✅ Immer allows state updates using mutation-like syntax.
 
 const App = () => {
-  const [state, setState] = useState(false);
+  const count = useSelector((state)=>state.counter.value)
+  const dispatch = useDispatch();
   return (
-    <div>
-       do something epic idk why
-       <button onClick={()=>setState((prev)=>!prev)}>click me to do something idk</button>
-       {state && createPortal(<div>see this shit bro </div>,document.body)}
-    </div>
+    <>
+    {count}
+    <button onClick={()=>dispatch(increment())} >increment counter by one</button>
+    <button onClick={()=>dispatch(decrement())} >decrement counter by one</button>
+    <button onClick={()=>dispatch(incrementByAmount(10))}>increment by certain amount</button>
+    </>
   )
 }
 
